@@ -120,6 +120,7 @@ def get_awair_url(url: str) -> Optional[AwairDict]:
 def discover_awairs() -> List[str]:
     """Tries to discover Awairs via ARP scanning"""
 
+    print("Discovering Awair devices...", end="", flush=True)
     grep = 'grep -v "^Starting\\|^Interface:\\|packets received\\|hosts scanned"'  # noqa pylint: disable=anomalous-backslash-in-string
     exe = f"arp-scan -l --quiet --ignoredups | {grep}"
     response = delegator.run(exe)
@@ -138,9 +139,12 @@ def discover_awairs() -> List[str]:
         ip_address = data[0]
         # mac = data[1]
 
+        print(".", end="", flush=True)
         if get_awair_config(ip_address):
+            print("+", end="", flush=True)
             ret.append(ip_address)
 
+    print()
     return ret
 
 
