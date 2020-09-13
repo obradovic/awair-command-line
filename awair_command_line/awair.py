@@ -34,7 +34,6 @@ def main():
     """
     ips = discover_awairs()
     if not ips:
-        print()
         print("No Awair devices found on the network. Exiting.")
         return
 
