@@ -3,13 +3,10 @@
 
 Displays Awair data on the command line. Includes conversion to Purple Air AQI scale.
 
-Requires `arp-scan` to be installed:
+Requires `arp-scan` to be installed: https://github.com/royhills/arp-scan
   <br/>
-  `brew install arp-scan` if you're on a Mac
-  <br/>
-  `apt install arp-scan` if you're on Debian
-  <br/>
-  `https://github.com/royhills/arp-scan` for everything else
+  * `brew install arp-scan` if you're on a Mac
+
 
 
 ![](install.gif)
