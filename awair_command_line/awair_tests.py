@@ -24,15 +24,41 @@ def test_get_aqi():
     assert result == 174
 
 
+def test_get_aqi_grade():
+    """ test
+    """
+    assert "green" in test.get_aqi_grade(2)
+    assert "yellow" in test.get_aqi_grade(51)
+
+
+def test_get_awair_grade():
+    """ test
+    """
+    tests = {
+        100: "Good",
+        99: "Good",
+        81: "Good",
+        80: "Good",
+        79: "Fair",
+        61: "Fair",
+        60: "Fair",
+        59: "Poor",
+        1: "Poor",
+    }
+
+    for score, grade in tests.items():
+        assert test.get_awair_grade(score) == grade
+
+
 def test_augment_data():
     """ test
     """
     config = {"display": "pm25"}
-    data = {"temp": 25, "humid": 60, "pm25": 1, "pm10_est": 1}
+    data = {"score": 85, "temp": 25, "humid": 60, "pm25": 1, "pm10_est": 1}
     result = test.augment_data(config, data)
     assert result["humidity_formatted"] == "60%"
-    assert result["farenheit"] == 77
-    assert result["aqi"] == 4
+    assert "77" in result["farenheit"]
+    assert "4" in result["aqi"]
 
 
 @patch(PACKAGE + "get_awair_config")

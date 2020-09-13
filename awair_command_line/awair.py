@@ -3,7 +3,7 @@
 from collections import OrderedDict
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-import aqi
+import aqi as aqilib
 import delegator
 import requests
 
@@ -14,9 +14,8 @@ TAB = "\t"
 HTTP_TIMEOUT = 0.5
 DISPLAY_KEYS = OrderedDict(
     {
-        "device_uuid": "Device name",
         "aqi": "Purple Air",
-        "currently_displaying": "Current display",
+        "awair_grade": "Awair grade",
         "pm25": "PM 2.5",
         "pm10_est": "PM 10",
         "farenheit": "Temperature (F)",
@@ -25,7 +24,7 @@ DISPLAY_KEYS = OrderedDict(
         "voc": "VOC",
         "voc_h2_raw": "VOC Raw",
         "voc_ethanol_raw": "VOC Ethanol",
-        "score": "Awair score",
+        "device_uuid": "Device name",
     }
 )
 
@@ -51,9 +50,13 @@ def augment_data(awair_config: AwairDict, awair_data: AwairDict) -> AwairDict:
     """ Augments the data
     """
     ret = {**awair_config, **awair_data}
-    ret["farenheit"] = round(float(ret["temp"]) * 1.8 + 32)
+    aqi = get_aqi(ret)
+    awair_score = int(ret["score"])
+
+    ret["farenheit"] = f"{round(float(ret['temp']) * 1.8 + 32)}º"
     ret["currently_displaying"] = ret[str(ret["display"])]
-    ret["aqi"] = get_aqi(ret)
+    ret["aqi"] = f"{aqi}, {get_aqi_grade(aqi)}"
+    ret["awair_grade"] = f"{awair_score}, {get_awair_grade(awair_score)}"
     ret["humidity_formatted"] = f"{round(float(ret['humid']))}%"
 
     return ret
@@ -75,14 +78,52 @@ def get_aqi(data: AwairDict) -> int:
     pm25 = data["pm25"]
     pm10 = data["pm10_est"]
 
-    algorithm = aqi.ALGO_EPA
-    # algorithm = aqi.ALGO_MEP  # China Ministry of Health
+    algorithm = aqilib.ALGO_EPA
+    # algorithm = aqilib.ALGO_MEP  # China Ministry of Health
 
-    ret = aqi.to_aqi(
-        [(aqi.POLLUTANT_PM25, pm25), (aqi.POLLUTANT_PM10, pm10)], algo=algorithm
+    ret = aqilib.to_aqi(
+        [(aqilib.POLLUTANT_PM25, pm25), (aqilib.POLLUTANT_PM10, pm10)], algo=algorithm
     )
 
     return int(ret)
+
+
+def get_aqi_grade(score: int) -> str:
+    """ Returns the color for the passed-in AQI
+        FROM: https://www3.epa.gov/airnow/aqi_brochure_02_14.pdf
+    """
+    grades_greater_than = {
+        -1: "Good (green)",
+        50: "Moderate (yellow)",
+        100: "Unhealthy for sensitive groups (orange)",
+        200: "Unhealthy (red)",
+        300: "Very unhealthy (purple)",
+        1000: "Hazardous (maroon)",
+    }
+
+    ret = ""
+    for grade, desc in grades_greater_than.items():
+        if score >= grade:
+            ret = desc
+
+    return ret
+
+
+def get_awair_grade(score: int) -> str:
+    """ Returns the color for the passed-in AQI
+    """
+    grades_greater_than = {
+        -1: "Poor",
+        60: "Fair",
+        80: "Good",
+    }
+
+    ret = ""
+    for grade, desc in grades_greater_than.items():
+        if score >= grade:
+            ret = desc
+
+    return ret
 
 
 def get_awair_data(ip_address: str) -> Optional[AwairDict]:
