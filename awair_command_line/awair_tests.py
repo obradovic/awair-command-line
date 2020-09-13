@@ -4,6 +4,8 @@
 from mock import MagicMock, patch  # create_autospec
 import awair_command_line.awair as test
 
+PACKAGE = "awair_command_line.awair."
+
 
 def reset_mocks(*mocks) -> None:
     """ Resets all the mocks
@@ -33,8 +35,8 @@ def test_augment_data():
     assert result["aqi"] == 4
 
 
-@patch("awair.awair.get_awair_config")
-@patch("awair.awair.delegator.run")
+@patch(PACKAGE + "get_awair_config")
+@patch(PACKAGE + "delegator.run")
 def test_discover_awairs(delegator_run, awair_config, capsys):
     """ test
     """
@@ -73,4 +75,3 @@ def test_discover_awairs(delegator_run, awair_config, capsys):
     assert response == []
     out, __ = capsys.readouterr()
     assert "Please" in out
-    reset_mocks(delegator_run, awair_config)
