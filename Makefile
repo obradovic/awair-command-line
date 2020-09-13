@@ -2,7 +2,8 @@
 
 SHELL := /bin/bash
 TIMER = TIMEFORMAT="This make $(MAKECMDGOALS) target took %1R seconds" && time  # bash built-in, requires bash to be the SHELL above
-SRC := awair_command_line/*.py
+PACKAGE = awair_command_line
+SRC := $(PACKAGE)/*.py
 PYTHONPATH = export PYTHONPATH=.
 
 
@@ -43,7 +44,7 @@ test:
 	@$(PYTHONPATH) $(TIMER) py.test .
 
 run:
-	@$(PYTHONPATH) $(TIMER) python awair/awair.py
+	@$(PYTHONPATH) $(TIMER) python $(PACKAGE)/awair.py
 
 clean:
 	@rm -rf .coverage .mypy_cache .pytest_cache __pycache__ build dist *.egg-info
