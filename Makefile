@@ -51,7 +51,7 @@ clean:
 #
 # Below this, things are only useful for wheel management
 #
-wheel: wheel-build wheel-install
+wheel: clean ci wheel-build
 
 # Builds the wheel
 wheel-build:
