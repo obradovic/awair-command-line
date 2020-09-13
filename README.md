@@ -3,15 +3,8 @@
 
 Displays Awair data on the command line. Includes conversion to Purple Air AQI scale.
 
-![](install.gif)
-
-
-```
-> pip install awair-command-line
-> awair
-
-```
-
 Requires `arp-scan` to be installed: https://github.com/royhills/arp-scan
+`brew install arp-scan` if you're on a Mac
 
-Better docs, screencasts, etc all TBD
+
+![](install.gif)
