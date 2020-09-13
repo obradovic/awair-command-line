@@ -1,0 +1,22 @@
+#
+# FOR SCAFFOLDING
+#
+black==19.10b0
+coverage==5.2.1
+coveralls==2.1.2
+ipython==7.18.1
+mock==4.0.2
+mypy==0.782
+pycodestyle==2.6.0
+pylint==2.6.0
+pylint-runner==0.6.0
+pytest==6.0.1
+pytest-cov==2.10.1
+
+#
+# FOR CODE
+#
+# PyChromecast==7.3.0
+delegator.py==0.1.1
+python-aqi==0.6.1
+requests==2.24.0

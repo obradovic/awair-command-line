@@ -1,0 +1,7 @@
+.coverage
+.env
+.mypy_cache
+__pycache__
+build
+dist
+*.egg-info

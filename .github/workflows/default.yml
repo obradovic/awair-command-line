@@ -1,0 +1,38 @@
+name: awair-command-line
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+env:
+  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-18.04
+    timeout-minutes: 5
+    steps:
+
+      # configure the python env
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8.5
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-
+          restore-keys: ${{ runner.os }}-pip-
+      - run: pip install -r requirements.txt
+
+      # formatting, type safety, linting, tests, test coverage
+      - run: make ci
+
+      # submit results
+      - run: coveralls
