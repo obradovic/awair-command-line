@@ -3,6 +3,8 @@
 
 Displays Awair data on the command line. Includes conversion to Purple Air AQI scale.
 
+![](install.gif)
+
 
 ```
 > pip install awair-command-line
