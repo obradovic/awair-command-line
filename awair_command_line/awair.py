@@ -1,7 +1,4 @@
 """ Discovers the Awair devices on the network, and displays their data
-
-    Example:
-        > awair
 """
 from collections import OrderedDict
 from datetime import datetime
