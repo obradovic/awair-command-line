@@ -4,7 +4,24 @@
 Displays Awair data on the command line. Includes conversion to Purple Air AQI scale.
 
 `pip install awair-command-line`
-`> awair`
+
+```
+> awair
+
+Device name:     awair-element_1234
+Purple Air:      17
+Current display: 4
+PM 2.5:          4
+PM 10:           5
+Temperature (F): 72
+Humidity:        58%
+Carbon Dioxide:  1271
+VOC:             1490
+VOC Raw:         27
+VOC Ethanol:     39
+Awair score:     75
+
+```
 
 Requires `arp-scan` to be installed: https://github.com/royhills/arp-scan
 
