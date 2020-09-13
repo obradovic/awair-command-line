@@ -2,7 +2,7 @@
     Tests
 """
 from mock import MagicMock, patch  # create_autospec
-import awair.awair as test
+import awair_command_line.awair as test
 
 
 def reset_mocks(*mocks) -> None:
