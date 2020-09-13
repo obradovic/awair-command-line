@@ -3,9 +3,9 @@
 
 Displays Awair data on the command line. Includes conversion to Purple Air AQI scale.
 
-`pip install awair-command-line`
 
 ```
+> pip install awair-command-line
 > awair
 
 Device name:     awair-element_1234
