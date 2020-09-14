@@ -28,7 +28,7 @@ PACKAGE = NAME.replace("-", "_")
 setup(
     install_requires=["delegator.py>=0.1.1", "python-aqi>=0.6.1", "requests>=2.0.0"],
     python_requires=">3.6.0",
-    description="Awair command line. Also the corresponding Purple Air AQI",
+    description="Awair command line. Displays data from all Awair devices on your network. Also shows corresponding Purple Air AQI",  # noqa  # pylint: disable=line-too-long
     entry_points={"console_scripts": [f"awair={PACKAGE}.awair:main"]},
     name=NAME,
     packages=[PACKAGE],
