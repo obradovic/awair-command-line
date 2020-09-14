@@ -170,7 +170,7 @@ def discover_awairs() -> List[str]:
 
     grep = 'grep -v "^Starting\\|^Interface:\\|packets received\\|hosts scanned"'  # noqa pylint: disable=anomalous-backslash-in-string
     exe = f"arp-scan -l --quiet --ignoredups | {grep}"
-    progress(show_progress, "Finding Awair devices...")
+    progress(show_progress, "Discovering Awair devices...")
     response = delegator.run(exe)
     if response.return_code:
         print()
@@ -201,7 +201,7 @@ def discover_awairs() -> List[str]:
     if mac and (not ret):
         error(f"Awair device not found at {mac}")
 
-    progress(show_progress, "")
+    progress(show_progress, NL)
     return ret
 
 
