@@ -32,17 +32,14 @@ DISPLAY_KEYS = OrderedDict(
 def main():
     """ main
     """
-    ips = discover_awairs()
-    if not ips:
-        print("No Awair devices found on the network. Exiting.")
-        return
-
-    for ip in ips:
+    ip_addresses = discover_awairs()
+    for ip in ip_addresses:
         config = get_awair_config(ip)
         data = get_awair_data(ip)
+        display(augment_data(config, data))
 
-        augmented = augment_data(config, data)
-        display(augmented)
+    if not ip_addresses:
+        print("No Awair devices found on the network. Exiting.")
 
 
 def augment_data(awair_config: AwairDict, awair_data: AwairDict) -> AwairDict:
