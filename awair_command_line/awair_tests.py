@@ -106,7 +106,7 @@ def test_discover_awairs(delegator_run, awair_config, capsys):
 def test_error(capsys):
     """ test
     """
-    response = test.error("foobar")
+    test.error("foobar")
     out, __ = capsys.readouterr()
     assert "ERROR:" in out
     assert "foobar" in out
@@ -115,13 +115,13 @@ def test_error(capsys):
 def test_progress(capsys):
     """ test
     """
-    response = test.progress(True, "foobar")
+    test.progress(True, "foobar")
     out, __ = capsys.readouterr()
     assert "foobar" in out
 
-    response = test.progress(False, "foobar")
+    test.progress(False, "foobar")
     out, __ = capsys.readouterr()
-    assert not "foobar" in out
+    assert "foobar" not in out
 
 
 def test_get_specified_ip():
