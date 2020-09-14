@@ -21,20 +21,23 @@ def get_file(filename: str) -> str:
     with open(filename, encoding="utf-8") as f:
         return f.read()
 
+NAME = "awair-command-line"
+PACKAGE = NAME.replace("-", "_")
+
 
 setup(
-    version=get_version(),
     install_requires=["delegator.py>=0.1.1", "python-aqi>=0.6.1", "requests>=2.0.0"],
     python_requires=">3.6.0",
-    entry_points={"console_scripts": ["awair=awair_command_line.awair:main"]},
-    name="awair-command-line",
-    url="https://github.com/obradovic/awair-command-line",
-    description="Awair command line",
+    description="Awair command line. Also the corresponding Purple Air AQI",
+    entry_points={"console_scripts": [f"awair={PACKAGE}.awair:main"]},
+    name=NAME,
+    packages=[PACKAGE],
+    url=f"https://github.com/obradovic/{NAME}",
     author="Zo Obradovic",
     author_email="ping@obradovic.com",
+    version=get_version(),
     long_description=get_readme_md_contents(),
     long_description_content_type="text/markdown",
-    packages=["awair_command_line"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
