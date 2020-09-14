@@ -140,8 +140,8 @@ def test_get_specified_ip():
 def test_get_specified_mac():
     """ test
     """
-    response = test.get_specified_mac(["--mac", "foobar"])
-    assert response == "foobar"
+    response = test.get_specified_mac(["--mac", "AA-bb"])
+    assert response == "aa:bb"
 
     response = test.get_specified_mac(["--something-else", "blah"])
     assert response is None
