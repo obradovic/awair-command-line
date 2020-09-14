@@ -1,7 +1,9 @@
 """ Discovers the Awair devices on the network, and displays their data
 """
+import argparse
 from collections import OrderedDict
 from datetime import datetime
+import sys
 from typing import Dict, List, Optional, Union
 import aqi as aqilib
 import delegator
@@ -48,8 +50,9 @@ def augment_data(awair_config: AwairDict, awair_data: AwairDict) -> AwairDict:
     ret = {**awair_config, **awair_data}
     aqi = get_aqi(ret)
     awair_score = int(ret["score"])
+    farenheit = round(float(ret["temp"]) * 1.8 + 32)
 
-    ret["farenheit"] = f"{round(float(ret['temp']) * 1.8 + 32)}º"
+    ret["farenheit"] = f"{farenheit}º"
     ret["currently_displaying"] = ret[str(ret["display"])]
     ret["aqi"] = f"{aqi}, {get_aqi_grade(aqi)}"
     ret["awair_grade"] = f"{awair_score}, {get_awair_grade(awair_score)}"
@@ -154,9 +157,20 @@ def get_awair_url(url: str) -> Optional[AwairDict]:
 def discover_awairs() -> List[str]:
     """Tries to discover Awairs via ARP scanning"""
 
-    print("Discovering Awair devices...", end="", flush=True)
+    ip_address = get_specified_ip()
+    if ip_address:
+        if get_awair_config(ip_address):
+            return [ip_address]
+
+        error(f"Awair device not found at {ip_address}")
+        return []
+
+    mac = get_specified_mac()
+    show_progress = not bool(mac)
+
     grep = 'grep -v "^Starting\\|^Interface:\\|packets received\\|hosts scanned"'  # noqa pylint: disable=anomalous-backslash-in-string
     exe = f"arp-scan -l --quiet --ignoredups | {grep}"
+    progress(show_progress, "Finding Awair devices...")
     response = delegator.run(exe)
     if response.return_code:
         print()
@@ -170,16 +184,76 @@ def discover_awairs() -> List[str]:
             continue
 
         data = line.split(TAB)
-        ip_address = data[0]
-        # mac = data[1]
+        this_ip = data[0]
+        this_mac = data[1]
 
-        print(".", end="", flush=True)
-        if get_awair_config(ip_address):
-            print("+", end="", flush=True)
-            ret.append(ip_address)
+        if mac:
+            if not this_mac == mac:
+                continue
 
-    print()
+        verified = verify_awair(this_ip)
+        if verified:
+            progress(show_progress, "+")
+            ret.append(this_ip)
+        else:
+            progress(show_progress, ".")
+
+    if mac and (not ret):
+        error(f"Awair device not found at {mac}")
+
+    progress(show_progress, "")
     return ret
+
+
+def error(string: str) -> None:
+    """ Prints an error message
+    """
+    print(f"ERROR: {string}")
+
+
+def progress(should_print: bool, string: str) -> None:
+    """ Prints and flushes the string, if the first arg is true
+    """
+    if should_print:
+        print(string, end="", flush=True)
+
+
+def verify_awair(ip_address: str) -> bool:
+    """ Verifies an Awair device is at the specified IP
+    """
+    if get_awair_config(ip_address):
+        return True
+
+    return False
+
+
+def get_specified_ip(the_args: Optional[List[str]] = None) -> Optional[str]:
+    """ Returns the IP address, if it was specified on the cmdline
+    """
+    return get_specified_arg("--ip", the_args)
+
+
+def get_specified_mac(the_args: Optional[List[str]] = None) -> Optional[str]:
+    """ Returns the MAC address, if it was specified on the cmdline
+    """
+    ret = get_specified_arg("--mac", the_args)
+    if ret:
+        ret = ret.lower().replace("-", ":")
+    return ret
+
+
+def get_specified_arg(
+    arg_name: str, the_args: Optional[List[str]] = None
+) -> Optional[str]:
+    """ Returns the arg for the passed-in mutually-exclusive list of args
+    """
+    if not the_args:
+        the_args = sys.argv[1:]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(arg_name, dest="item")
+    parsed, _ = parser.parse_known_args(the_args)
+    return parsed.item
 
 
 if __name__ == "__main__":

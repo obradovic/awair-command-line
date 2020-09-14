@@ -101,3 +101,50 @@ def test_discover_awairs(delegator_run, awair_config, capsys):
     assert response == []
     out, __ = capsys.readouterr()
     assert "Please" in out
+
+
+def test_error(capsys):
+    """ test
+    """
+    response = test.error("foobar")
+    out, __ = capsys.readouterr()
+    assert "ERROR:" in out
+    assert "foobar" in out
+
+
+def test_progress(capsys):
+    """ test
+    """
+    response = test.progress(True, "foobar")
+    out, __ = capsys.readouterr()
+    assert "foobar" in out
+
+    response = test.progress(False, "foobar")
+    out, __ = capsys.readouterr()
+    assert not "foobar" in out
+
+
+def test_get_specified_ip():
+    """ test
+    """
+    response = test.get_specified_ip(["--ip", "foobar"])
+    assert response == "foobar"
+
+    response = test.get_specified_ip(["--something-else", "blah"])
+    assert response is None
+
+    response = test.get_specified_ip([])
+    assert response is None
+
+
+def test_get_specified_mac():
+    """ test
+    """
+    response = test.get_specified_mac(["--mac", "foobar"])
+    assert response == "foobar"
+
+    response = test.get_specified_mac(["--something-else", "blah"])
+    assert response is None
+
+    response = test.get_specified_mac([])
+    assert response is None
