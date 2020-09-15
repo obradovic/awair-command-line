@@ -9,4 +9,4 @@ Requires `arp-scan` to be installed: https://github.com/royhills/arp-scan
 
 
 
-![](install.gif)
+![](.install.gif)
