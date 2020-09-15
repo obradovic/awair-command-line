@@ -56,9 +56,9 @@ def test_augment_data():
     config = {"display": "pm25"}
     data = {"score": 85, "temp": 25, "humid": 60, "pm25": 1, "pm10_est": 1}
     result = test.augment_data(config, data)
-    assert result["humidity_formatted"] == "60%"
-    assert "77" in result["farenheit"]
-    assert "4" in result["aqi"]
+    assert result["humidity_display"] == "60%"
+    assert "77" in result["farenheit_display"]
+    assert "4" in result["aqi_display"]
 
 
 @patch(PACKAGE + "get_awair_config")
@@ -68,11 +68,13 @@ def test_discover_awairs(delegator_run, awair_config, capsys):
     """
     awair_config.return_value = True
 
+    tab = "\t"
+    nl = "\n"
     ip = "127.0.0.1"
     mac = "aa:aa:aa:aa:aa:aa"
 
     # One Awair found
-    delegator_output = ip + test.TAB + mac
+    delegator_output = ip + tab + mac
     delegator_run.return_value = MagicMock(return_code=0, out=delegator_output)
     response = test.discover_awairs()
     assert len(response) == 1
@@ -80,7 +82,7 @@ def test_discover_awairs(delegator_run, awair_config, capsys):
     reset_mocks(delegator_run, awair_config)
 
     # Multiple Awairs found
-    delegator_output = (ip + test.TAB + mac + test.NL) * 2
+    delegator_output = (ip + tab + mac + nl) * 2
     delegator_run.return_value = MagicMock(return_code=0, out=delegator_output)
     response = test.discover_awairs()
     assert len(response) == 2

@@ -4,41 +4,29 @@ import argparse
 from collections import OrderedDict
 from datetime import datetime
 import sys
-from typing import Dict, List, Optional, Union
+from typing import List, Optional
 import aqi as aqilib
 import delegator
 import requests
+from awair_command_line.statsd import report_statsd, AwairDict
 
 
-AwairDict = Dict[str, Union[int, float, str]]
-NL = "\n"
-TAB = "\t"
-HTTP_TIMEOUT = 0.5
-DISPLAY_KEYS = OrderedDict(
-    {
-        "aqi": "Purple Air",
-        "awair_grade": "Awair grade",
-        "pm25": "PM 2.5",
-        "pm10_est": "PM 10",
-        "farenheit": "Temperature (F)",
-        "humidity_formatted": "Humidity",
-        "co2": "Carbon Dioxide",
-        "voc": "VOC",
-        "voc_h2_raw": "VOC Raw",
-        "voc_ethanol_raw": "VOC Ethanol",
-        "device_uuid": "Device name",
-    }
-)
-
-
-def main():
+def main() -> None:
     """ main
     """
     ip_addresses = discover_awairs()
     for ip in ip_addresses:
         config = get_awair_config(ip)
+        if not config:
+            return
+
         data = get_awair_data(ip)
-        display(augment_data(config, data))
+        if not data:
+            return
+
+        augmented = augment_data(config, data)
+        display(augmented)
+        report_statsd(augmented)
 
     if not ip_addresses:
         print("No Awair devices found on the network. Exiting.")
@@ -52,11 +40,13 @@ def augment_data(awair_config: AwairDict, awair_data: AwairDict) -> AwairDict:
     awair_score = int(ret["score"])
     farenheit = round(float(ret["temp"]) * 1.8 + 32)
 
-    ret["farenheit"] = f"{farenheit}º"
-    ret["currently_displaying"] = ret[str(ret["display"])]
-    ret["aqi"] = f"{aqi}, {get_aqi_grade(aqi)}"
-    ret["awair_grade"] = f"{awair_score}, {get_awair_grade(awair_score)}"
-    ret["humidity_formatted"] = f"{round(float(ret['humid']))}%"
+    ret["farenheit"] = farenheit
+    ret["farenheit_display"] = f"{farenheit}º"
+    ret["number_on_awair"] = ret[str(ret["display"])]
+    ret["aqi"] = aqi
+    ret["aqi_display"] = f"{aqi}, {get_aqi_grade(aqi)}"
+    ret["awair_display"] = f"{awair_score}, {get_awair_grade(awair_score)}"
+    ret["humidity_display"] = f"{round(float(ret['humid']))}%"
 
     return ret
 
@@ -64,8 +54,24 @@ def augment_data(awair_config: AwairDict, awair_data: AwairDict) -> AwairDict:
 def display(data: AwairDict) -> None:
     """ Prints the data
     """
+    display_keys = OrderedDict(
+        {
+            "aqi_display": "Purple Air",
+            "awair_display": "Awair grade",
+            "pm25": "PM 2.5",
+            "pm10_est": "PM 10",
+            "farenheit_display": "Temperature (F)",
+            "humidity_display": "Humidity",
+            "co2": "Carbon Dioxide",
+            "voc": "VOC",
+            "voc_h2_raw": "VOC Raw",
+            "voc_ethanol_raw": "VOC Ethanol",
+            "device_uuid": "Device name",
+        }
+    )
+
     print()
-    for original_name, new_name in DISPLAY_KEYS.items():
+    for original_name, new_name in display_keys.items():
         display_name = f"{new_name}:"
         print(f"{display_name:<16} {data[original_name]}")
     print()
@@ -143,8 +149,10 @@ def get_awair_config(ip_address: str) -> Optional[AwairDict]:
 def get_awair_url(url: str) -> Optional[AwairDict]:
     """ Returns JSON from the passed-in URL
     """
+    http_timeout = 1.0
+
     try:
-        response = requests.get(url, timeout=HTTP_TIMEOUT)
+        response = requests.get(url, timeout=http_timeout)
         if not response.ok:
             return None
 
@@ -156,6 +164,8 @@ def get_awair_url(url: str) -> Optional[AwairDict]:
 
 def discover_awairs() -> List[str]:
     """Tries to discover Awairs via ARP scanning"""
+    nl = "\n"
+    tab = "\t"
 
     ip_address = get_specified_ip()
     if ip_address:
@@ -179,11 +189,11 @@ def discover_awairs() -> List[str]:
         return []
 
     ret = []
-    for line in response.out.split(NL):
+    for line in response.out.split(nl):
         if not line:
             continue
 
-        data = line.split(TAB)
+        data = line.split(tab)
         this_ip = data[0]
         this_mac = data[1]
 
@@ -201,7 +211,7 @@ def discover_awairs() -> List[str]:
     if mac and (not ret):
         error(f"Awair device not found at {mac}")
 
-    progress(show_progress, NL)
+    progress(show_progress, nl)
     return ret
 
 
