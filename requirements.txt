@@ -17,6 +17,7 @@ pytest-cov==2.10.1
 # FOR CODE
 #
 # PyChromecast==7.3.0
+datadog==0.39.0
 delegator.py==0.1.1
 python-aqi==0.6.1
 requests==2.24.0
