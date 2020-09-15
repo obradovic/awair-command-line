@@ -12,7 +12,7 @@ all: black ci
 	@echo "ALL GOOD!"
 	@echo ""
 
-ci: blackcheck typecheck pep lint test coverage
+ci: blackcheck mypy pep lint test coverage
 
 black:
 	@$(TIMER) black $(SRC)
@@ -26,7 +26,7 @@ lint:
 pep:
 	@$(TIMER) pycodestyle $(SRC)
 
-typecheck:
+mypy:
 	@$(TIMER) mypy $(SRC)
 
 coverage: coverage-run coverage-report
