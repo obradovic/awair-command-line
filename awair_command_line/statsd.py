@@ -23,6 +23,7 @@ def report_statsd(data: AwairDict) -> None:
         "humid": "humidity",
         "pm10_est": "pm10",
         "pm25": "pm25",
+        "score": "awair_score",
         "voc": "voc",
         "voc_h2_raw": "voc_raw",
         "voc_baseline": "voc_baseline",
